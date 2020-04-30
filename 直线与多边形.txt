@@ -1,0 +1,26 @@
+resetCanvas 600 500
+setColor 0 255 0
+drawLine line1 200 300 400 150 DDA
+drawLine line2 90 50 490 200 DDA
+drawLine line3 80 50 510 50 DDA
+drawLine line5 70 50 70 200 DDA
+drawLine line6 55 210 55 210 DDA
+drawPolygon p1 57 300 125 300 165 297 140 100 115 90 90 100 DDA
+saveCanvas 1
+setColor 255 0 0
+drawLine line1 200 300 400 150 Bresenham
+drawLine line2 90 50 490 200 Bresenham
+drawLine line3 80 50 510 50 Bresenham
+drawLine line4 70 50 70 200 Bresenham
+drawLine line5 55 210 55 210 Bresenham
+drawLine line6 0 0 0 10 Bresenham
+drawPolygon p1 57 300 125 300 165 297 140 100 115 90 90 100 Bresenham
+saveCanvas 2
+setColor 0 0 255
+drawLine line1 200 300 400 150 Naive
+drawLine line2 90 50 490 200 Naive
+drawLine line3 80 50 510 50 Naive
+drawLine line4 70 50 70 200 Naive
+drawLine line5 55 210 55 210 Naive
+drawPolygon p1 57 300 125 300 165 297 140 100 115 90 90 100 Naive
+saveCanvas 3
