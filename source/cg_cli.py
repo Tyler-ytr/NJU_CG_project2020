@@ -91,12 +91,13 @@ if __name__ == '__main__':
                 algorithm = 'default'
                 item_dict[item_id] = ['ellipse', [[x0, y0], [x1, y1]], algorithm, np.array(pen_color)]
             elif line[0] == 'drawCurve':
+                #print(line)
                 item_id = line[1]
                 point_couple = []
                 for i in range(2, len(line) - 2, 2):
                     tempx = int(line[i])
                     tempy = int(line[i + 1])
-                    # print(tempx,tempy)
+                    #print(tempx,tempy)
                     point_couple.append([tempx, tempy])
                 algorithm = line[len(line) - 1]
                 # print(algorithm)

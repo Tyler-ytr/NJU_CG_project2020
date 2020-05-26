@@ -40,7 +40,7 @@ class MainWindow(QMainWindow):
         # 菜单栏
         mfile = menubar.addMenu("文件")
         # 重置
-        reset_canvas_act = QAction(QIcon("./picture/newer.png"), "重置画布", self)
+        reset_canvas_act = QAction(QIcon("./icon/file.png"), "重置画布", self)
 
         # reset_canvas_act.triggered.connect(self.reset_canvas_action) #To be done
 
@@ -54,9 +54,10 @@ class MainWindow(QMainWindow):
 
     def pen_width(self):
         w = self.spinbox_penwidth.text()
-        #w = int(w)
+        w = int(w)
         #print("w:" + w)
         self.canvas_widget.setpenWidth(w)
+        self.statusBar().showMessage('宽度为%d'%(w))
 
     def pen_color(self):
         c=QColorDialog.getColor()
@@ -115,17 +116,34 @@ class MainWindow(QMainWindow):
         self.setCentralWidget(self.Image_window)
         self.addDockWidget(Qt.TopDockWidgetArea,self.Tool_window)
         self.addDockWidget(Qt.RightDockWidgetArea,self.List_window)
+    def line_action(self,algorithm):
+        self.canvas_widget.start_draw_line(algorithm,self.get_id())
+        self.statusBar().showMessage(algorithm+'算法绘制线段')
+        self.list_widget.clearSelection()
+        self.canvas_widget.clear_selection()
+    def DDA_line_draw_action(self):
+        self.line_action('DDA')
 
-    def test1(self):
-        a=1
-    def test2(self):
-        a=2
+    def Bresenham_line_draw_action(self):
+        self.line_action('Bresenham')
+    def polygon_action(self,algorithm):
+        self.canvas_widget.start_draw_polygon(algorithm,self.get_id())
+        self.statusBar().showMessage(algorithm+'算法绘制多边形')
+        self.list_widget.clearSelection()
+        self.canvas_widget.clear_selection()
+    def DDA_polygon_draw_action(self):
+        self.polygon_action('DDA')
+
+    def Bresenham_polygon_draw_action(self):
+        self.polygon_action('Bresenham')
     def tool_init(self):
+        #line相关,使用的https://www.walletfox.com/course/customqtoolbutton.php做的可选算法button
         self.line_action_1=QAction("DDA line")
         self.line_action_2=QAction("Bresenham line")
-        self.line_action_1.setIcon(QIcon("./picture/line.png"))
-        self.line_action_2.setIcon(QIcon("./picture/line.png"))
-
+        self.line_action_1.setIcon(QIcon("./icon/line.png"))
+        self.line_action_2.setIcon(QIcon("./icon/line.png"))
+        self.line_action_1.triggered.connect(self.DDA_line_draw_action)
+        self.line_action_2.triggered.connect(self.Bresenham_line_draw_action)
         self.line_menu=QMenu()
         self.line_menu.addAction(self.line_action_1)
         self.line_menu.addAction(self.line_action_2)
@@ -135,24 +153,33 @@ class MainWindow(QMainWindow):
         self.line_tool_bar=QToolBar(self)
         self.line_tool_bar.addWidget(self.line_tool_button)
 
+        #polygon相关
+        self.polygon_action_1=QAction("DDA polygon")
+        self.polygon_action_2=QAction("Bresenham polygon")
+        self.polygon_action_1.setIcon(QIcon("./icon/polygon.png"))
+        self.polygon_action_2.setIcon(QIcon("./icon/polygon.png"))
+        self.polygon_action_1.triggered.connect(self.DDA_polygon_draw_action)
+        self.polygon_action_2.triggered.connect(self.Bresenham_polygon_draw_action)
+        self.polygon_menu=QMenu()
+        self.polygon_menu.addAction(self.polygon_action_1)
+        self.polygon_menu.addAction(self.polygon_action_2)
+        self.polygon_tool_button=CusToolButton()
+        self.polygon_tool_button.setMenu(self.polygon_menu)
+        self.polygon_tool_button.setDefaultAction(self.polygon_action_1)
+        self.polygon_tool_bar=QToolBar(self)
+        self.polygon_tool_bar.addWidget(self.polygon_tool_button)
+
+        #ellipse相关
+        
 
 
 
-    #     #直线
-    #     line_button_1=QPushButton(QIcon("./picture/line.png"),"",self)
-    #     line_button_1.setToolTip("直线1")
-    #     line_button_1.setObjectName("toolButton")
-    #     line_button_1.setFixedSize(30,30)
-    #     line_button_1.setStatusTip("DDA")
-    #
-    #
     #     #布局
         tools_layout=QGridLayout()
         tools_layout.setAlignment(Qt.AlignLeft)
         tools_layout.addWidget(self.line_tool_bar,0,0)
-    #
+        tools_layout.addWidget(self.polygon_tool_bar, 0, 1)
         #加入tool_window
-        #To be done
         tools_widget=QWidget(self.Tool_window)
         tools_widget.setLayout(tools_layout)
         self.Tool_window.setWidget(tools_widget)
@@ -177,6 +204,7 @@ class MainWindow(QMainWindow):
 
     def __init__(self):
         super().__init__()
+        self.item_cnt = 0
 
 
         ## 主窗口布局
@@ -212,6 +240,9 @@ class MainWindow(QMainWindow):
         self.List_window.setWidget(self.list_widget)
         self.Image_window.setWidget(self.canvas_widget)
 
+        #槽函数
+        self.list_widget.currentTextChanged.connect(self.canvas_widget.selection_changed)
+
         self.layout_init()
         self.tool_init()
 
@@ -224,3 +255,8 @@ class MainWindow(QMainWindow):
         #self.setCentralWidget(self.central_widget)
         self.statusBar().showMessage('空闲')
         self.resize(600, 600)
+    def get_id(self):
+        _id=str(self.item_cnt)
+        self.item_cnt+=1
+        return _id
+
