@@ -12,6 +12,10 @@ def draw_line(p_list, algorithm):
     :param algorithm: (string) 绘制使用的算法，包括'DDA'和'Bresenham'，此处的'Naive'仅作为示例，测试时不会出现
     :return: (list of list of int: [[x_0, y_0], [x_1, y_1], [x_2, y_2], ...]) 绘制结果的像素点坐标列表
     """
+    temp_list_int = []
+    for [x, y] in p_list:
+        temp_list_int.append([round(x), round(y)])
+    p_list=temp_list_int
     x0, y0 = p_list[0]
     x1, y1 = p_list[1]
     result = []
@@ -26,48 +30,68 @@ def draw_line(p_list, algorithm):
             for x in range(x0, x1 + 1):
                 result.append((x, int(y0 + k * (x - x0))))
     elif algorithm == 'DDA':
-        if x0 > x1:
-            x1, x0 = x0, x1
-            y1, y0 = y0, y1
         dx = x1 - x0
         dy = y1 - y0
-        k = 999999999
-        k_inf = 0
-        if dx == 0:
-            k_inf = 1
+        if (abs(dx) > abs(dy)):
+            k = abs(dx)
         else:
-            k = dy / dx
-        x = round(x0)
-        y = round(y0)
-        '''起始点'''
-        if k > -1 and k < 1:
-            while True:
-                if x > x1:
-                    break
-                result.append((round(x), round(y)))
-                x = x + 1
-                y = y + k
-        elif k >= 1:
-            '''Y最大位移'''
-            while True:
-                if y > y1:
-                    break
-                result.append((round(x), round(y)))
-                y = y + 1
-                if k_inf == 0:
-                    x = x + 1 / k
-                else:
-                    x = x
-        else:
-            while True:
-                if y < y1:
-                    break
-                result.append((round(x), round(y)))
-                y = y - 1
-                if k_inf == 0:
-                    x = x - 1 / k
-                else:
-                    x = x
+            k = abs(dy)
+        if k==0:
+           result.append([x1,y1])
+           return result
+        delta_x = dx / k
+        delta_y = dy / k
+        for i in range(k + 1):
+            tempx = int(x0 + i * delta_x)
+            tempy = int(y0 + i * delta_y)
+            result.append([tempx, tempy])
+        #
+        #
+        # if x0 > x1:
+        #     x1, x0 = x0, x1
+        #     y1, y0 = y0, y1
+        # dx = x1 - x0
+        # dy = y1 - y0
+        # k = 999999999
+        # k_inf = 0
+        # if dx == 0:
+        #     k_inf = 1
+        # else:
+        #     k = dy / dx
+        # x = round(x0)
+        # y = round(y0)
+        # '''起始点'''
+        # if k > -1 and k < 1:
+        #     while True:
+        #         if x > x1:
+        #             print("herer3")
+        #             break
+        #         result.append((round(x), round(y)))
+        #         x = x + 1
+        #         y = y + k
+        # elif k >= 1:
+        #     '''Y最大位移'''
+        #     while True:
+        #         if y > y1:
+        #             print("herer1",y,y1)
+        #             break
+        #         result.append((round(x), round(y)))
+        #         y = y + 1
+        #         if k_inf == 0:
+        #             x = x + 1 / k
+        #         else:
+        #             x = x
+        # else:
+        #     while True:
+        #         if y < y1:
+        #             print("herer2")
+        #             break
+        #         result.append((round(x), round(y)))
+        #         y = y - 1
+        #         if k_inf == 0:
+        #             x = x - 1 / k
+        #         else:
+        #             x = x
 
         '''pass'''
         '''参考:https://www.youtube.com/watch?v=W5P8GlaEOSI
@@ -152,51 +176,72 @@ def draw_ellipse(p_list):
     :param p_list: (list of list of int: [[x0, y0], [x1, y1]]) 椭圆的矩形包围框左上角和右下角顶点坐标
     :return: (list of list of int: [[x_0, y_0], [x_1, y_1], [x_2, y_2], ...]) 绘制结果的像素点坐标列表
     """
+
     result = []
+    # tempx0,tempy0=p_list[0]
+    # tempx1,tempy1=p_list[1]
+    # print("temp0",tempx0,tempy0)
+    # print("temp1",tempx1, tempy1)
+    # x0=min(tempx0,tempx1)
+    # y0=max(tempy0,tempy1)
+    # x1=max(tempx0,tempx1)
+    # y1=min(tempy0,tempy1)
     x0, y0 = p_list[0]
     x1, y1 = p_list[1]
+    if x0==x1 and y0==y1:
+        result.append((x0,y0))
+        return result
+    if y0==y1:
+        result=draw_line([[x0,y0],[x1,y1]],"DDA")
+        return result
+
 
     rx = abs(x1 - x0) / 2
     ry = abs(y1 - y0) / 2
     xc = x0 + rx
-    yc = y0 + ry
+    yc = y0 - ry
     p = ry * ry - rx * rx * ry + (rx * rx / 4)
 
     tx = 0
     ty = ry
+    step=1
     packet = []
-    packet.append((round(tx), round(ry)))
+    #packet.append((round(tx), round(ty)))
+    packet.append((tx, ty))
     # print("begin",rx,ry,xc,yc)
     while 2 * ry * ry * tx < 2 * rx * rx * ty:
-        #   print(tx,ty)
+        #print(tx,ty)
         #  print("left",2 * ry * ry * tx," right",2 * rx * ty)
 
         if p < 0:
-            tx = tx + 1
+            tx = tx + step
             p = p + 2 * ry * ry * tx + ry * ry
         elif p >= 0:
-            tx = tx + 1
-            ty = ty - 1
+            tx = tx + step
+            ty = ty - step
             p = p + 2 * ry * ry * tx - 2 * rx * rx * ty + ry * ry
         # print("herer")
-        packet.append((round(tx), round(ty)))
+        packet.append((tx, ty))
+        # packet.append((round(tx), round(ty)))
     # print("out left", 2 * ry * ry * tx, " right", 2 * rx * ty)
     p2 = ry * ry * (tx + 0.5) * (tx + 0.5) + rx * rx * (ty - 1) * (ty - 1) - rx * rx * ry * ry
     # print("next")
     while True:
         #   print(tx, ty)
-        if tx >= rx and ty <= 0:
+        if ty <= 0:
             '''循环到(rx,0)'''
             break
         if p2 > 0:
-            ty = ty - 1
+            ty = ty - step
             p2 = p2 - 2 * rx * rx * ty + rx * rx
+            #print(p2)
         else:
-            tx = tx + 1
-            ty = ty - 1
+            tx = tx + step
+            ty = ty - step
             p2 = p2 + 2 * ry * ry * tx - 2 * rx * rx * ty + rx * rx
 
-        packet.append((round(tx), round(ty)))
+        # packet.append((round(tx), round(ty)))
+        packet.append((tx, ty))
 
     for k in range(len(packet)):
         tempx, tempy = packet[k]
@@ -204,6 +249,11 @@ def draw_ellipse(p_list):
         result.append((round(xc + tempx), round(yc - tempy)))
         result.append((round(xc - tempx), round(yc + tempy)))
         result.append((round(xc - tempx), round(yc - tempy)))
+        # result.append((xc + tempx, yc + tempy))
+        # result.append((xc + tempx, yc - tempy))
+        # result.append((xc - tempx, yc + tempy))
+        # result.append((xc - tempx, yc - tempy))
+
 
     return result
 
@@ -284,7 +334,10 @@ def draw_curve(p_list, algorithm):
             y = yarray[0]
 
         for i in range(0, len(q_list) - 1):
-            line = draw_line([q_list[i], q_list[i + 1]], 'DDA')
+            tempx0,tempy0=q_list[i]
+            tempx1,tempy1=q_list[i+1]
+            line=draw_line([[round(tempx0),round(tempy0)],[round(tempx1),round(tempy1)]],'DDA')
+            #line = draw_line([q_list[i], q_list[i + 1]], 'DDA')
             result += line
         # pass
     elif algorithm == 'B-spline':
@@ -307,7 +360,10 @@ def draw_curve(p_list, algorithm):
                 q_list.append([x, y])
                 t = t + step
         for i in range(0, len(q_list) - 1):
-            line = draw_line([q_list[i], q_list[i + 1]], 'DDA')
+            tempx0,tempy0=q_list[i]
+            tempx1,tempy1=q_list[i+1]
+            line=draw_line([[round(tempx0),round(tempy0)],[round(tempx1),round(tempy1)]],'DDA')
+            # line = draw_line([q_list[i], q_list[i + 1]], 'DDA')
             result += line
 
     # 参考: Bezier: https://www.bilibili.com/video/av33675067?p=15
@@ -376,13 +432,19 @@ def scale(p_list, x, y, s):
     :return: (list of list of int: [[x_0, y_0], [x_1, y_1], [x_2, y_2], ...]) 变换后的图元参数
     """
     result = []
+
     for [i, j] in p_list:
-        x0 = x - i
-        y0 = y - j
-        tempx = x0 * s + x
-        tempy = y0 * s + y
+        qx=(i-x)*s
+        qy=(j-y)*s
+        tempx=qx+x
+        tempy=qy+y
         result.append([tempx, tempy])
     return result
+
+    # def _scale(p:list)->list:
+    #     qx,qy=(p[0]-x)*s,(p[1]-y)*s
+    #     return [int(qx+x),int(qy+y)]
+    # return list(map(_scale,p_list))
     # pass
 
 
