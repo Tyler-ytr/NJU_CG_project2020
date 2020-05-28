@@ -27,7 +27,7 @@ from PyQt5.QtWidgets import (
     QFileDialog,
 
 )
-from PyQt5.QtGui import QPainter, QMouseEvent, QColor, QIcon, QPalette,QPixmap,QImage
+from PyQt5.QtGui import QPainter, QMouseEvent, QColor, QIcon, QPalette, QPixmap, QImage
 from cg_PaintWidget import MyCanvas, MyItem
 from PyQt5.QtCore import *
 from PIL import Image
@@ -43,22 +43,23 @@ class CusToolButton(QToolButton):
 
 class MainWindow(QMainWindow):
     def reset_canvas_action(self):
-        self.item_cnt=0
+        self.item_cnt = 0
         self.canvas_widget.reset_canvas()
+
     def save_canvas_action(self):
-        #pixMap = view->grab(view->sceneRect().toRect());
+        # pixMap = view->grab(view->sceneRect().toRect());
         # QString
         # fileName = QFileDialog::getSaveFileName(this, "Save image",
         #                                         QCoreApplication::applicationDirPath(), "BMP Files (*.bmp);;JPEG (*.JPEG);;PNG (*.png)" );
-        #filename=QFileDialog.getSaveFileName("Save image",QCoreApplication.applicationDirPath(),"BMP Files (*.bmp);;JPEG (*.JPEG);;PNG (*.png)")
-        filename , ok2 = QFileDialog.getSaveFileName(self,
-                                    "Save Image",
-                                    QDir.currentPath(),
-                                    "BMP Files (*.bmp);;JPEG (*.JPEG);;PNG (*.png)")
+        # filename=QFileDialog.getSaveFileName("Save image",QCoreApplication.applicationDirPath(),"BMP Files (*.bmp);;JPEG (*.JPEG);;PNG (*.png)")
+        filename, ok2 = QFileDialog.getSaveFileName(self,
+                                                    "Save Image",
+                                                    QDir.currentPath(),
+                                                    "BMP Files (*.bmp);;JPEG (*.JPEG);;PNG (*.png)")
 
         #
-        pixmap=QPixmap()
-        pixmap=self.canvas_widget.grab(self.canvas_widget.sceneRect().toRect())
+        pixmap = QPixmap()
+        pixmap = self.canvas_widget.grab(self.canvas_widget.sceneRect().toRect())
         pixmap.save(filename)
 
     def Menu_init(self):
@@ -68,10 +69,10 @@ class MainWindow(QMainWindow):
         # 重置
         reset_canvas_act = QAction(QIcon("./icon/file.png"), "重置画布", self)
 
-        reset_canvas_act.triggered.connect(self.reset_canvas_action) #To be done
+        reset_canvas_act.triggered.connect(self.reset_canvas_action)  # To be done
 
-        #保存
-        save_canvas_act=QAction(QIcon("./icon/save.png"),"保存画布",self)
+        # 保存
+        save_canvas_act = QAction(QIcon("./icon/save.png"), "保存画布", self)
         save_canvas_act.triggered.connect(self.save_canvas_action)
 
         # 将action添加到file上面
@@ -203,12 +204,13 @@ class MainWindow(QMainWindow):
         self.canvas_widget.start_draw_scale()
         self.statusBar().showMessage('缩放图元')
 
-    def clip_draw_action(self,algorithm):
+    def clip_draw_action(self, algorithm):
         self.canvas_widget.start_draw_clip(algorithm)
-        self.statusBar().showMessage(algorithm+'裁剪线段')
+        self.statusBar().showMessage(algorithm + '裁剪线段')
 
     def Cohen_Sutherland_clip_draw_action(self):
         self.clip_draw_action("Cohen-Sutherland")
+
     def Liang_Barsky_clip_draw_action(self):
         self.clip_draw_action("Liang_Barsky")
 
@@ -301,11 +303,10 @@ class MainWindow(QMainWindow):
         self.clip_action_1.triggered.connect(self.Cohen_Sutherland_clip_draw_action)
         self.clip_action_2.triggered.connect(self.Liang_Barsky_clip_draw_action)
 
-
-        self.clip_menu=QMenu()
+        self.clip_menu = QMenu()
         self.clip_menu.addAction(self.clip_action_1)
         self.clip_menu.addAction(self.clip_action_2)
-        self.clip_tool_button=CusToolButton()
+        self.clip_tool_button = CusToolButton()
         self.clip_tool_button.setMenu(self.clip_menu)
         self.clip_tool_button.setDefaultAction(self.clip_action_1)
 
@@ -357,26 +358,53 @@ class MainWindow(QMainWindow):
         self.Menu_init()
         self.Color_init()
 
-        # list widget
+
         self.Image_window = QDockWidget("图像编辑框")
         self.Image_window.setFeatures(QDockWidget.DockWidgetMovable | QDockWidget.DockWidgetFloatable)
         self.Image_window.setAllowedAreas(Qt.LeftDockWidgetArea | Qt.RightDockWidgetArea)
-        self.Image_window.setMinimumSize(602, 602)
+        self.Image_window.setMinimumSize(620, 620) #大一点点 不然会有边框线
 
         self.List_window = QDockWidget("图元列表")
         self.List_window.setFeatures(QDockWidget.DockWidgetMovable)
         self.list_widget = QListWidget(self.List_window)
         self.list_widget.setMinimumWidth(200)
         self.scene = QGraphicsScene(self)
-        self.scene.setSceneRect(0, 0, 600, 600)
+        self.scene.setSceneRect(1, 1, 601, 601) #挪一个像素,不然会有边框线
+
         self.canvas_widget = MyCanvas(self.scene, self.Image_window)
 
-        self.canvas_widget.setFixedSize(602, 602)#这样就没有滑动条了
+        self.canvas_widget.setFixedSize(610, 610)#这样就没有滑动条了
         self.canvas_widget.main_window = self
         self.canvas_widget.list_widget = self.list_widget
 
         self.List_window.setWidget(self.list_widget)
         self.Image_window.setWidget(self.canvas_widget)
+        self.setCentralWidget(self.Image_window)
+        height=self.Image_window.height()
+        width=self.Image_window.width()
+        center_y=(self.canvas_widget.geometry().height()-height)/2
+        center_x=(self.canvas_widget.geometry().width()-width)/2
+        self.canvas_widget.setGeometry(center_x,center_y,self.canvas_widget.geometry().width(),self.canvas_widget.geometry().height())
+        self.canvas_widget.setAlignment(Qt.AlignCenter)
+        # self.list_widget = QListWidget(self)
+        # self.list_widget.setMinimumWidth(200)
+        # self.scene = QGraphicsScene(self)
+        # self.scene.setSceneRect(1, 1, 601, 601)
+        # self.canvas_widget = MyCanvas(self.scene, self)
+        # self.canvas_widget.setFixedSize(600+10, 600+10)
+        # self.canvas_widget.main_window = self
+        # self.canvas_widget.list_widget = self.list_widget
+        # self.list_widget.currentTextChanged.connect(self.canvas_widget.selection_changed)
+        #
+        # # 设置主窗口的布局
+        # self.hbox_layout = QHBoxLayout()
+        # self.hbox_layout.addWidget(self.canvas_widget)
+        # self.hbox_layout.addWidget(self.list_widget, stretch=1)
+        # self.central_widget = QWidget()
+        # self.central_widget.setLayout(self.hbox_layout)
+        # self.setCentralWidget(self.central_widget)
+        # self.statusBar().showMessage('空闲')
+        # self.resize(600+10, 600+10)
 
         # 槽函数
         self.list_widget.currentTextChanged.connect(self.canvas_widget.selection_changed)
