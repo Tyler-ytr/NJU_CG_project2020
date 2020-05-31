@@ -45,7 +45,11 @@ class MainWindow(QMainWindow):
     def reset_canvas_action(self):
         self.item_cnt = 0
         self.canvas_widget.reset_canvas()
-
+        #self.list_widget.clear()
+        self.list_widget.currentTextChanged.disconnect(self.canvas_widget.selection_changed)
+        self.list_widget.clear()
+        self.list_widget.currentTextChanged.connect(self.canvas_widget.selection_changed)
+        #解决了一个bug参考 https://blog.csdn.net/yaowangII/article/details/80929261
     def save_canvas_action(self):
         # pixMap = view->grab(view->sceneRect().toRect());
         # QString

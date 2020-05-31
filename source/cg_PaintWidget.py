@@ -48,13 +48,15 @@ class MyCanvas(QGraphicsView):
 
         self.rotateangle = 0
     def reset_canvas(self):
+        #self.clear_selection()
         self.centerx = 0
         self.centery = 0
         self.firstx = 0
         self.firsty = 0
         self.scene().clear()
+        #self.list_widget.clear()
         self.item_dict.clear()
-        self.list_widget.clear()
+
 
         self.selected_id = ''
 
@@ -62,8 +64,9 @@ class MyCanvas(QGraphicsView):
         self.temp_algorithm = ''
         self.temp_id = ''
         self.temp_item = None
-        self.finish_draw()
+        #self.finish_draw()
 
+        #self.temp_id = ''
 
     def setpenColor(self, c: QColor):
         self.penColor = c
