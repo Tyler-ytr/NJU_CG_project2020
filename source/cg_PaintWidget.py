@@ -45,28 +45,39 @@ class MyCanvas(QGraphicsView):
         self.centery = 0
         self.firstx = 0
         self.firsty = 0
+        self.cur_id=0#用于鼠标选择
+
 
         self.rotateangle = 0
     def reset_canvas(self):
-        #self.clear_selection()
+        self.clear_selection()
+
+        self.cur_id=0
         self.centerx = 0
         self.centery = 0
         self.firstx = 0
         self.firsty = 0
+        self.temp_item = None
+
         self.scene().clear()
-        #self.list_widget.clear()
+        self.scene().update()
+        self.list_widget.clear()
+
+
+
         self.item_dict.clear()
-
-
+        self.item_dict.update()
         self.selected_id = ''
 
         self.status = ''
         self.temp_algorithm = ''
         self.temp_id = ''
-        self.temp_item = None
+
         #self.finish_draw()
 
         #self.temp_id = ''
+
+
 
     def setpenColor(self, c: QColor):
         self.penColor = c
@@ -75,45 +86,66 @@ class MyCanvas(QGraphicsView):
         self.penwidth = w
 
     def start_draw_line(self, algorithm, item_id):
+        self.finish_draw()
         self.status = 'line'
         self.temp_algorithm = algorithm
         self.temp_id = item_id
         # self.polygonlist.clear()
 
     def start_draw_polygon(self, algorithm, item_id):
+        self.finish_draw()
         self.status = 'polygon'
         self.temp_algorithm = algorithm
         self.temp_id = item_id
 
     def start_draw_ellipse(self, item_id):
+        self.finish_draw()
         self.status = 'ellipse'
         self.temp_id = item_id
 
     def start_draw_curve(self, algorithm, item_id):
+        self.finish_draw()
         self.status = 'curve'
         self.temp_algorithm = algorithm
         self.temp_id = item_id
 
     def start_draw_translate(self):
+        self.finish_draw(1)
         self.status = 'translate'
+
         self.temp_id = self.selected_id
         # print(self.selected_id)
 
     def start_draw_rotate(self):
+        self.finish_draw(1)
         self.status = 'rotate'
+
         self.temp_id = self.selected_id
 
     def start_draw_scale(self):
+        self.finish_draw(1)
         self.status = 'scale'
+
         self.temp_id = self.selected_id
     def start_draw_clip(self,algorithm):
+        self.finish_draw(1)
         self.status='clip'
+
         self.temp_id=self.selected_id
         self.temp_algorithm = algorithm
+    def start_cursor_selection(self):
+        if self.status=='ellipse' or self.status=='polygon' or self.status=='curve':
+            self.item_dict[self.temp_id] = self.temp_item
+            self.list_widget.addItem(self.temp_id)
+        self.status='cursor'
+        self.finish_draw()
 
-    def finish_draw(self):
+    def finish_draw(self,a=0):
 
-        if self.status == 'translate' or self.status == 'rotate' or self.status == 'scale' or self.status=='clip':
+        if self.status=='line' or self.status=='ellipse' or self.status=='polygon' or self.status=='curve':
+            self.item_dict[self.temp_id] = self.temp_item
+            self.list_widget.addItem(self.temp_id)
+        if self.status == 'translate' or self.status == 'rotate' or self.status == 'scale' or self.status=='clip' or self.status=='cursor'or a==1:
             self.temp_id = self.selected_id
         else:
             self.temp_id = self.main_window.get_id()
@@ -127,6 +159,8 @@ class MyCanvas(QGraphicsView):
             self.selected_id = ''
 
     def selection_changed(self, selected):
+        if selected==-1:
+            return
         self.main_window.statusBar().showMessage('图元选择： %s' % selected)
         if self.selected_id != '':
             self.item_dict[self.selected_id].selected = False
@@ -135,10 +169,6 @@ class MyCanvas(QGraphicsView):
         self.item_dict[selected].selected = True
         self.item_dict[selected].update()
         self.status = ''
-        # if self.status!='translate':
-        #     self.status = ''
-        # else:
-        #     self.temp_id=self.selected_id
         self.updateScene([self.sceneRect()])
 
     def polygoncheck(self, x0, y0):
@@ -204,8 +234,8 @@ class MyCanvas(QGraphicsView):
                 self.scene().addItem(self.temp_item)
             else:
                 if event.button() == Qt.RightButton:
-                    self.item_dict[self.temp_id] = self.temp_item
-                    self.list_widget.addItem(self.temp_id)
+                    # self.item_dict[self.temp_id] = self.temp_item
+                    # self.list_widget.addItem(self.temp_id)
                     self.finish_draw()
                     self.temp_item = None
                 else:
@@ -213,8 +243,8 @@ class MyCanvas(QGraphicsView):
                     if success:
                         self.temp_item.p_list.append([x, y])
                     else:
-                        self.item_dict[self.temp_id] = self.temp_item
-                        self.list_widget.addItem(self.temp_id)
+                        # self.item_dict[self.temp_id] = self.temp_item
+                        # self.list_widget.addItem(self.temp_id)
                         self.finish_draw()
                         self.temp_item = None
         if self.status == 'ellipse':
@@ -228,8 +258,8 @@ class MyCanvas(QGraphicsView):
                 self.scene().addItem(self.temp_item)
             else:
                 if event.button() == Qt.RightButton:
-                    self.item_dict[self.temp_id] = self.temp_item
-                    self.list_widget.addItem(self.temp_id)
+                    # self.item_dict[self.temp_id] = self.temp_item
+                    # self.list_widget.addItem(self.temp_id)
                     self.finish_draw()
                     self.temp_item = None
                 else:
@@ -237,8 +267,8 @@ class MyCanvas(QGraphicsView):
                     if success:
                         self.temp_item.p_list.append([x, y])
                     else:
-                        self.item_dict[self.temp_id] = self.temp_item
-                        self.list_widget.addItem(self.temp_id)
+                        # self.item_dict[self.temp_id] = self.temp_item
+                        # self.list_widget.addItem(self.temp_id)
                         self.finish_draw()
                         self.temp_item = None
         if self.status == 'translate':
@@ -281,6 +311,19 @@ class MyCanvas(QGraphicsView):
                 self.drawtemp_item=MyItem(1, Qt.blue,-1, "Rect", [[x, y], [x, y]],
                                         self.temp_algorithm)
                 self.scene().addItem(self.drawtemp_item)
+        if self.status=='cursor':
+            #print("cursor")
+            tempx=x
+            tempy=y
+            temptemp_item=self.itemAt(tempx,tempy)
+            select_id=-1
+            for k,v in self.item_dict.items():
+                if v==temptemp_item:
+                    select_id=k
+            print(select_id)
+            self.cur_id=select_id
+
+
 
 
 
@@ -358,14 +401,14 @@ class MyCanvas(QGraphicsView):
         x = max(0, x)
         y = max(0, y)
         if self.status == 'line':
-            self.item_dict[self.temp_id] = self.temp_item
-            self.list_widget.addItem(self.temp_id)
+            # self.item_dict[self.temp_id] = self.temp_item
+            # self.list_widget.addItem(self.temp_id)
             self.finish_draw()
         if self.status == 'ellipse':
             self.temp_item.p_list[1] = [x, y]
             self.updateScene([self.sceneRect()])
-            self.item_dict[self.temp_id] = self.temp_item
-            self.list_widget.addItem(self.temp_id)
+            # self.item_dict[self.temp_id] = self.temp_item
+            # self.list_widget.addItem(self.temp_id)
             self.finish_draw()
         if self.status == 'translate':
             self.item_dict[self.temp_id] = self.temp_item
@@ -384,11 +427,14 @@ class MyCanvas(QGraphicsView):
             x1,y1=self.temp_item.p_list[1]
             if x0==0 and y0==0 and x1==0 and y1==0:
                 self.scene().removeItem(self.temp_item)
-                self.item_dict.pop(self.temp_id)
+                #self.item_dict.pop(self.temp_id)
                 self.status=''
                 #self.list_widget.removeItemWidget(self.temp_id)
 
             self.finish_draw()
+        if self.status=='cursor':
+            #print(self.cur_id)
+            self.selection_changed(self.cur_id)
 
 
         #     # self.temp_item.posx=x

@@ -19,6 +19,8 @@ def draw_line(p_list, algorithm):
     x0, y0 = p_list[0]
     x1, y1 = p_list[1]
     result = []
+    if x0==0 and y0==0 and x1 ==0 and y1==0:
+        return result
     if algorithm == 'Naive':
         if x0 == x1:
             for y in range(y0, y1 + 1):
@@ -484,6 +486,12 @@ def clip(p_list, x_min, y_min, x_max, y_max, algorithm):
     # Cohen-Sutherland 算法
     # 参考:https://www.jianshu.com/p/d512116bbbf3
     # https://www.omegaxyz.com/2018/10/29/cohen-sutherland/
+    tempx_min=min(x_min,x_max)
+    tempy_min=min(y_min,y_max)
+    tempx_max=max(x_max,x_min)
+    tempy_max=max(y_max,y_min)
+
+    x_min,y_min,x_max,y_max=tempx_min,tempy_min,tempx_max,tempy_max
     if algorithm == 'Cohen-Sutherland':
         INSIDE = 0  # 0000
         LEFT = 1  # 0001
@@ -552,6 +560,7 @@ def clip(p_list, x_min, y_min, x_max, y_max, algorithm):
         # 参考：https://blog.csdn.net/soulmeetliang/article/details/79185603
         result = []
         # p_list, x_min, y_min, x_max, y_max, algorithm
+
         x0, y0 = p_list[0]
         x1, y1 = p_list[1]
         dx = x1 - x0

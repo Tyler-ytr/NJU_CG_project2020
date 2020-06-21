@@ -43,12 +43,19 @@ class CusToolButton(QToolButton):
 
 class MainWindow(QMainWindow):
     def reset_canvas_action(self):
+
         self.item_cnt = 0
         self.canvas_widget.reset_canvas()
         #self.list_widget.clear()
         self.list_widget.currentTextChanged.disconnect(self.canvas_widget.selection_changed)
         self.list_widget.clear()
         self.list_widget.currentTextChanged.connect(self.canvas_widget.selection_changed)
+        self.scene = QGraphicsScene(self)
+        self.scene.setSceneRect(1, 1, 601, 601) #挪一个像素,不然会有边框线
+
+        self.canvas_widget.setScene(self.scene)
+        #self.canvas_widget = MyCanvas(self.scene, self.Image_window)
+
         #解决了一个bug参考 https://blog.csdn.net/yaowangII/article/details/80929261
     def save_canvas_action(self):
         # pixMap = view->grab(view->sceneRect().toRect());
@@ -216,7 +223,10 @@ class MainWindow(QMainWindow):
         self.clip_draw_action("Cohen-Sutherland")
 
     def Liang_Barsky_clip_draw_action(self):
-        self.clip_draw_action("Liang_Barsky")
+        self.clip_draw_action("Liang-Barsky")
+    def cursor_draw_action(self):
+        self.canvas_widget.start_cursor_selection()
+        self.statusBar().showMessage('鼠标选择')
 
     def tool_init(self):
         # line相关,使用的https://www.walletfox.com/course/customqtoolbutton.php做的可选算法button
@@ -317,6 +327,14 @@ class MainWindow(QMainWindow):
         self.clip_tool_bar = QToolBar(self)
         self.clip_tool_bar.addWidget(self.clip_tool_button)
 
+        #鼠标选择相关;
+        self.cursor_action=QAction("Cursor")
+        self.cursor_action.setIcon(QIcon("./icon/cursor.png"))
+        self.cursor_action.triggered.connect(self.cursor_draw_action)
+
+        self.cursor_tool_bar=QToolBar(self)
+        self.cursor_tool_bar.addAction(self.cursor_action)
+
         #     #布局
         tools_layout = QGridLayout()
         tools_layout.setAlignment(Qt.AlignLeft)
@@ -328,6 +346,7 @@ class MainWindow(QMainWindow):
         tools_layout.addWidget(self.rotate_tool_bar, 0, 5)
         tools_layout.addWidget(self.scale_tool_bar, 0, 6)
         tools_layout.addWidget(self.clip_tool_bar, 0, 7)
+        tools_layout.addWidget(self.cursor_tool_bar, 0, 8)
         # 加入tool_window
         tools_widget = QWidget(self.Tool_window)
         tools_widget.setLayout(tools_layout)
@@ -390,25 +409,7 @@ class MainWindow(QMainWindow):
         center_x=(self.canvas_widget.geometry().width()-width)/2
         self.canvas_widget.setGeometry(center_x,center_y,self.canvas_widget.geometry().width(),self.canvas_widget.geometry().height())
         self.canvas_widget.setAlignment(Qt.AlignCenter)
-        # self.list_widget = QListWidget(self)
-        # self.list_widget.setMinimumWidth(200)
-        # self.scene = QGraphicsScene(self)
-        # self.scene.setSceneRect(1, 1, 601, 601)
-        # self.canvas_widget = MyCanvas(self.scene, self)
-        # self.canvas_widget.setFixedSize(600+10, 600+10)
-        # self.canvas_widget.main_window = self
-        # self.canvas_widget.list_widget = self.list_widget
-        # self.list_widget.currentTextChanged.connect(self.canvas_widget.selection_changed)
-        #
-        # # 设置主窗口的布局
-        # self.hbox_layout = QHBoxLayout()
-        # self.hbox_layout.addWidget(self.canvas_widget)
-        # self.hbox_layout.addWidget(self.list_widget, stretch=1)
-        # self.central_widget = QWidget()
-        # self.central_widget.setLayout(self.hbox_layout)
-        # self.setCentralWidget(self.central_widget)
-        # self.statusBar().showMessage('空闲')
-        # self.resize(600+10, 600+10)
+
 
         # 槽函数
         self.list_widget.currentTextChanged.connect(self.canvas_widget.selection_changed)
