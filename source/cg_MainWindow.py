@@ -227,6 +227,9 @@ class MainWindow(QMainWindow):
     def cursor_draw_action(self):
         self.canvas_widget.start_cursor_selection()
         self.statusBar().showMessage('鼠标选择')
+    def fill_draw_action(self):
+        self.canvas_widget.start_fill_polygon()
+        self.statusBar().showMessage('多边形填充')
 
     def tool_init(self):
         # line相关,使用的https://www.walletfox.com/course/customqtoolbutton.php做的可选算法button
@@ -334,6 +337,14 @@ class MainWindow(QMainWindow):
 
         self.cursor_tool_bar=QToolBar(self)
         self.cursor_tool_bar.addAction(self.cursor_action)
+        #多边形填充相关:
+        self.fill_action=QAction("Fill")
+        self.fill_action.setIcon(QIcon("./icon/fill.png"))
+
+        self.fill_action.triggered.connect(self.fill_draw_action)
+        self.fill_tool_bar=QToolBar(self)
+        self.fill_tool_bar.addAction(self.fill_action)
+
 
         #     #布局
         tools_layout = QGridLayout()
@@ -347,6 +358,7 @@ class MainWindow(QMainWindow):
         tools_layout.addWidget(self.scale_tool_bar, 0, 6)
         tools_layout.addWidget(self.clip_tool_bar, 0, 7)
         tools_layout.addWidget(self.cursor_tool_bar, 0, 8)
+        tools_layout.addWidget(self.fill_tool_bar,0,9)
         # 加入tool_window
         tools_widget = QWidget(self.Tool_window)
         tools_widget.setLayout(tools_layout)

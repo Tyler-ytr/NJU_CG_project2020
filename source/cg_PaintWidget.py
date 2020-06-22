@@ -139,13 +139,25 @@ class MyCanvas(QGraphicsView):
             self.list_widget.addItem(self.temp_id)
         self.status='cursor'
         self.finish_draw()
+    def start_fill_polygon(self):
+        self.finish_draw(1)
+        self.status='fill'
+        if self.selected_id!='':
+            self.temp_id=self.selected_id
+            self.temp_item=self.item_dict[self.temp_id]
+            if self.temp_item.item_type=='polygon':
+                self.temp_item.fill(self.penColor)
+
+            self.finish_draw()
+
+
 
     def finish_draw(self,a=0):
 
         if self.status=='line' or self.status=='ellipse' or self.status=='polygon' or self.status=='curve':
             self.item_dict[self.temp_id] = self.temp_item
             self.list_widget.addItem(self.temp_id)
-        if self.status == 'translate' or self.status == 'rotate' or self.status == 'scale' or self.status=='clip' or self.status=='cursor'or a==1:
+        if self.status == 'translate' or self.status == 'rotate' or self.status == 'scale' or self.status=='clip' or self.status=='cursor'or a==1 or self.status=='fill':
             self.temp_id = self.selected_id
         else:
             self.temp_id = self.main_window.get_id()
@@ -320,7 +332,6 @@ class MyCanvas(QGraphicsView):
             for k,v in self.item_dict.items():
                 if v==temptemp_item:
                     select_id=k
-            print(select_id)
             self.cur_id=select_id
 
 
@@ -414,9 +425,12 @@ class MyCanvas(QGraphicsView):
             self.item_dict[self.temp_id] = self.temp_item
             self.finish_draw()
         if self.status == 'rotate':
+            self.temp_item.rotate_fill()
             self.item_dict[self.temp_id] = self.temp_item
+
             self.finish_draw()
         if self.status == 'scale':
+            self.temp_item.scale_fill()
             self.item_dict[self.temp_id] = self.temp_item
             self.finish_draw()
         if self.status=='clip':
@@ -435,6 +449,7 @@ class MyCanvas(QGraphicsView):
         if self.status=='cursor':
             #print(self.cur_id)
             self.selection_changed(self.cur_id)
+
 
 
         #     # self.temp_item.posx=x
@@ -477,6 +492,11 @@ class MyItem(QGraphicsItem):
         self.temppen = QPen()
         self.temppen.setWidth(self.pen_width)
         self.temppen.setColor(self.pen_color)
+        self.if_polygon_fill=False
+        self.filled_list=[]
+        self.fill_color=pencolor
+        self.fillpen=QPen()
+
 
     def translate(self, dx, dy):
         temp_list = alg.translate(self.p_list, dx, dy)
@@ -484,15 +504,37 @@ class MyItem(QGraphicsItem):
         # for [x, y] in temp_list:
         #     temp_list_int.append([round(x), round(y)])
         self.p_list = temp_list
+        if self.if_polygon_fill==True:
+            temp_list=alg.translate(self.filled_list,dx,dy)
+            self.filled_list=temp_list
 
     def rotate(self, x, y, r):
         if self.item_type!='ellipse':
             temp_list = alg.rotate(self.p_list, x, y, r)
             self.p_list = temp_list
+        if self.if_polygon_fill==True:
+            temp_list= alg.rotate(self.filled_list, x, y, r)
+            self.filled_list=temp_list
+    def rotate_fill(self):
+        if self.if_polygon_fill==True:
+            #print("herer\n")
+            temp_list = alg.polifill(self.p_list)
+            self.filled_list=temp_list
+
+
 
     def scalea(self, x, y, s):#重名加了一个a
         temp_list = alg.scale(self.p_list, x, y, s)
         self.p_list = temp_list
+        if self.if_polygon_fill==True:
+            temp_list= alg.scale(self.filled_list, x, y, s)
+            self.filled_list=temp_list
+    def scale_fill(self):
+        if self.if_polygon_fill==True:
+            #print("herer\n")
+            temp_list = alg.polifill(self.p_list)
+            self.filled_list=temp_list
+
     def clip(self,x1,y1,x2,y2,algorithm):
         if self.item_type=='line':
             xmin=min(x1,x2)
@@ -501,6 +543,14 @@ class MyItem(QGraphicsItem):
             ymax=max(y1,y2)
             temp_list=alg.clip(self.p_list,xmin,ymin,xmax,ymax,algorithm)
             self.p_list=temp_list
+    def fill(self,fillcolor):
+
+        self.fill_color=fillcolor
+        self.if_polygon_fill=True
+        self.filled_list=alg.polifill(self.p_list)
+        self.fillpen.setColor(self.fill_color)
+
+
 
     def paint(self, painter: QPainter, option: QStyleOptionGraphicsItem, widget: Optional[QWidget] = ...) -> None:
         painter.setPen(self.temppen)
@@ -513,12 +563,20 @@ class MyItem(QGraphicsItem):
                 painter.drawRect(self.boundingRect())
         elif self.item_type == 'polygon':
             if len(self.p_list) >= 2:
+                #填充
+                if self.if_polygon_fill:
+                    painter.setPen(self.fillpen)
+                    for p in self.filled_list:
+                        painter.drawPoint(*p)
+                painter.setPen(self.temppen)
                 item_pixels = alg.draw_polygon(self.p_list, self.algorithm)
                 for p in item_pixels:
                     painter.drawPoint(*p)
             if self.selected:
                 painter.setPen(QColor(255, 0, 0))
                 painter.drawRect(self.boundingRect())
+
+
         elif self.item_type == 'ellipse':
             x0, y0 = self.p_list[0]
             x1, y1 = self.p_list[1]
