@@ -50,28 +50,30 @@ class MyCanvas(QGraphicsView):
 
         self.rotateangle = 0
     def reset_canvas(self):
-        self.clear_selection()
-
-        self.cur_id=0
-        self.centerx = 0
-        self.centery = 0
-        self.firstx = 0
-        self.firsty = 0
-        self.temp_item = None
-
-        self.scene().clear()
-        self.scene().update()
-        self.list_widget.clear()
-
-
-
-        self.item_dict.clear()
-        self.item_dict.update()
-        self.selected_id = ''
-
-        self.status = ''
-        self.temp_algorithm = ''
-        self.temp_id = ''
+        pass
+        #self.clear_selection()
+        #print("herer")
+        #
+        # self.cur_id=0
+        # self.centerx = 0
+        # self.centery = 0
+        # self.firstx = 0
+        # self.firsty = 0
+        # self.temp_item = None
+        # #
+        # self.scene().clear()
+        # self.scene().update()
+        # self.list_widget.clear()
+        #
+        #
+        #
+        # self.item_dict.clear()
+        # self.item_dict.update()
+        # self.selected_id = ''
+        #
+        # self.status = ''
+        # self.temp_algorithm = ''
+        # self.temp_id = ''
 
         #self.finish_draw()
 
@@ -86,25 +88,25 @@ class MyCanvas(QGraphicsView):
         self.penwidth = w
 
     def start_draw_line(self, algorithm, item_id):
-        self.finish_draw()
+        self.finish_draw(1)
         self.status = 'line'
         self.temp_algorithm = algorithm
         self.temp_id = item_id
         # self.polygonlist.clear()
 
     def start_draw_polygon(self, algorithm, item_id):
-        self.finish_draw()
+        self.finish_draw(1)
         self.status = 'polygon'
         self.temp_algorithm = algorithm
         self.temp_id = item_id
 
     def start_draw_ellipse(self, item_id):
-        self.finish_draw()
+        self.finish_draw(1)
         self.status = 'ellipse'
         self.temp_id = item_id
 
     def start_draw_curve(self, algorithm, item_id):
-        self.finish_draw()
+        self.finish_draw(1)
         self.status = 'curve'
         self.temp_algorithm = algorithm
         self.temp_id = item_id
@@ -135,8 +137,9 @@ class MyCanvas(QGraphicsView):
         self.temp_algorithm = algorithm
     def start_cursor_selection(self):
         if self.status=='ellipse' or self.status=='polygon' or self.status=='curve':
-            self.item_dict[self.temp_id] = self.temp_item
-            self.list_widget.addItem(self.temp_id)
+            if self.temp_item!=None:
+                self.item_dict[self.temp_id] = self.temp_item
+                self.list_widget.addItem(self.temp_id)
         self.status='cursor'
         self.finish_draw()
     def start_fill_polygon(self):
@@ -149,15 +152,22 @@ class MyCanvas(QGraphicsView):
                 self.temp_item.fill(self.penColor)
 
             self.finish_draw()
+    def start_cut_polygon(self):
+        self.finish_draw(1)
+        self.status='polygon_cut'
+        self.temp_id = self.selected_id
+        self.finish_draw()
+
 
 
 
     def finish_draw(self,a=0):
 
         if self.status=='line' or self.status=='ellipse' or self.status=='polygon' or self.status=='curve':
-            self.item_dict[self.temp_id] = self.temp_item
-            self.list_widget.addItem(self.temp_id)
-        if self.status == 'translate' or self.status == 'rotate' or self.status == 'scale' or self.status=='clip' or self.status=='cursor'or a==1 or self.status=='fill':
+            if self.temp_item!=None:
+                self.item_dict[self.temp_id] = self.temp_item
+                self.list_widget.addItem(self.temp_id)
+        if self.status == 'translate' or self.status == 'rotate' or self.status == 'scale' or self.status=='clip' or self.status=='cursor'or a==1 or self.status=='fill'or self.status=='polygon_cut':
             self.temp_id = self.selected_id
         else:
             self.temp_id = self.main_window.get_id()
@@ -334,6 +344,19 @@ class MyCanvas(QGraphicsView):
                     select_id=k
             self.cur_id=select_id
 
+        if self.status=='polygon_cut':
+            if self.temp_id not in self.item_dict:
+                self.status=''
+                pass
+            elif self.temp_item is None:
+                self.temp_item = self.item_dict[self.temp_id]
+                self.firstx=x
+                self.firsty=y
+                self.drawtemp_item=MyItem(1, Qt.green,-1, "Rect", [[x, y], [x, y]],
+                                        self.temp_algorithm)
+                self.scene().addItem(self.drawtemp_item)
+
+
 
 
 
@@ -399,6 +422,15 @@ class MyCanvas(QGraphicsView):
             self.drawtemp_item.p_list[0]=[xmin,ymin]
             self.drawtemp_item.p_list[1]=[xmax,ymax]
             self.updateScene([self.sceneRect()])
+        if self.status=='polygon_cut':
+            x0, y0 = self.firstx, self.firsty
+            xmin=min(x0,x)
+            xmax=max(x0,x)
+            ymin=min(y0,y)
+            ymax=max(y0,y)
+            self.drawtemp_item.p_list[0]=[xmin,ymin]
+            self.drawtemp_item.p_list[1]=[xmax,ymax]
+            self.updateScene([self.sceneRect()])
 
 
         super().mouseMoveEvent(event)
@@ -450,6 +482,19 @@ class MyCanvas(QGraphicsView):
             #print(self.cur_id)
             self.selection_changed(self.cur_id)
 
+        if self.status=='polygon_cut':
+            self.temp_item.polygon_cut(self.firstx,self.firsty,x,y)
+            self.scene().removeItem(self.drawtemp_item)
+            self.item_dict[self.temp_id] = self.temp_item
+            x0,y0=self.temp_item.p_list[0]
+            x1,y1=self.temp_item.p_list[1]
+            if x0==0 and y0==0 and x1==0 and y1==0:
+                self.scene().removeItem(self.temp_item)
+                #self.item_dict.pop(self.temp_id)
+                self.status=''
+                #self.list_widget.removeItemWidget(self.temp_id)
+
+            self.finish_draw()
 
 
         #     # self.temp_item.posx=x
@@ -484,7 +529,7 @@ class MyItem(QGraphicsItem):
         super().__init__(parent)
         self.id = item_id  # 图元ID
         self.item_type = item_type  # 图元类型，'line'、'polygon'、'ellipse'、'curve'等
-        self.p_list = p_list  # 图元参数
+        self.p_list = p_list  # 图元参数,如果是polygon_cut类型,最后两个点是边框(xmin,ymin,xmax,ymax)
         self.algorithm = algorithm  # 绘制算法，'DDA'、'Bresenham'、'Bezier'、'B-spline'等
         self.selected = False
         self.pen_width = penwidth
@@ -496,6 +541,7 @@ class MyItem(QGraphicsItem):
         self.filled_list=[]
         self.fill_color=pencolor
         self.fillpen=QPen()
+        #self.polygon_cut_list=[]#存储边框
 
 
     def translate(self, dx, dy):
@@ -549,6 +595,18 @@ class MyItem(QGraphicsItem):
         self.if_polygon_fill=True
         self.filled_list=alg.polifill(self.p_list)
         self.fillpen.setColor(self.fill_color)
+    def polygon_cut(self,x0,y0,x1,y1):
+        xmin,xmax=min(x0,x1),max(x0,x1)
+        ymin,ymax=min(y0,y1),max(y0,y1)
+        if self.item_type=='polygon':
+            self.item_type='polygon_cut'
+            self.p_list.append([xmin,ymin])
+            self.p_list.append([xmax,ymax])
+        elif self.item_type=='polygon_cut':
+            length=len(self.p_list)
+            self.p_list[length-2]=[xmin,ymin]
+            self.p_list[length-1]=[xmax,ymax]
+
 
 
 
@@ -616,6 +674,20 @@ class MyItem(QGraphicsItem):
             if self.selected:
                 painter.setPen(QColor(255, 0, 0))
                 painter.drawRect(self.boundingRect())
+        elif self.item_type=='polygon_cut':
+            if len(self.p_list)>=4:
+                length=len(self.p_list)
+                xmin,ymin=self.p_list[length-2]
+                xmax,ymax=self.p_list[length-1]
+                temp_list=self.p_list[0:length-2]
+                item_pixels=alg.draw_polygon_cut(temp_list,xmin,xmax,ymin,ymax)
+                for p in item_pixels:
+                    painter.drawPoint(*p)
+            if self.selected:
+                painter.setPen(QColor(255, 0, 0))
+                painter.drawRect(self.boundingRect())
+
+
 
 
     def boundingRect(self) -> QRectF:
@@ -675,4 +747,19 @@ class MyItem(QGraphicsItem):
             w = max(x0, x1) - x
             h = max(y0, y1) - y
             return QRectF(x - 1, y - 1, w + 2, h + 2)
-
+        elif self.item_type=='polygon_cut':
+            if len(self.p_list) == 0:
+                return QRectF(0, 0, 0, 0)
+            if len(self.p_list) < 2:
+                x0, y0 = self.p_list[0]
+                return QRectF(x0 - 1, y0 - 1, x0 + 1, y0 + 1)
+            x_list = []
+            y_list = []
+            for [x0, y0] in self.p_list[0:(len(self.p_list))-2]:
+                x_list.append(x0)
+                y_list.append(y0)
+            x = min(x_list)
+            y = min(y_list)
+            w = max(x_list) - x
+            h = max(y_list) - y
+            return QRectF(x - 1, y - 1, w + 2, h + 2)

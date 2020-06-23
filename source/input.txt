@@ -1,4 +1,10 @@
 resetCanvas 600 500
 setColor 0 255 0
-drawEllipse ellipse1 95 214 498 85
+drawPolygon p1 20 20 120 20 70 100 50 80 30 120 20 50 50 50 DDA
 saveCanvas 1
+setColor 255 0 0
+drawPolygon p1 20 20 100 52 70 100 50 80 30 120 40 50 50 50 Bresenham
+saveCanvas 2
+setColor 0 0 255
+drawPolygon p1 57 300 125 300 165 297 140 100 115 90 90 100 Naive
+saveCanvas 3

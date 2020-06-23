@@ -774,3 +774,102 @@ def polifill(polygon):
 
 
     return result
+
+
+def encode(x,y,XL,XR,YB,YT):
+    LEFT = 1  # 0001 左
+    RIGHT = 2  # 0010 右
+    BOTTOM = 4  # 0100 下
+    TOP = 8  # 1000 上
+    c=0
+
+    if(x<XL):
+        c=c|LEFT
+    if(x>XR):
+        c= c|RIGHT
+    if(y<YB):
+        c= c|BOTTOM
+    if(y>YT):
+        c=c|TOP
+    return c
+
+
+def draw_polygon_cut(polygon,XL,XR,YB,YT):
+    #参考了https://blog.csdn.net/sinat_34686158/article/details/78745216
+    LEFT = 1  # 0001 左
+    RIGHT = 2  # 0010 右
+    BOTTOM = 4  # 0100 下
+    TOP = 8  # 1000 上
+    #image=image
+    result=[]
+    xmin,xmax=min(XL,XR),max(XL,XR)
+    ymin,ymax=min(YB,YT),max(YB,YT)
+    XL,XR,YB,YT=xmin,xmax,ymin,ymax
+
+    l = len(polygon)
+    for i in range(l):
+        [x1, y1] = polygon[i]
+        [x2, y2] = polygon[(i + 1 + l) % l]
+
+        flag=0
+        code1=encode(x1,y1,XL,XR,YB,YT)
+        code2=encode(x2,y2,XL,XR,YB,YT)
+        while(code1!=0 or code2!=0):        #同时为0,在内部，不用裁剪
+            if(code1 & code2 !=0):
+                flag=1
+                break
+            if(code1!=0):
+                code=code1
+            else:
+                code=code2
+            if(LEFT & code!=0):      #点在线左边
+                 x=XL
+                 if(x1==x2):
+                     y=y1
+                 else:
+                     y=(int)(y1+(y2-y1)*(XL-x1)/(x2-x1))
+            elif(RIGHT & code!=0):   #点在线右边
+                x = XR
+                if(x2==x1):
+                    y=y1
+                else:
+                    y = (int)(y1 + (y2 - y1) * (XR - x1) / (x2 - x1))
+            elif (BOTTOM & code != 0):     #点在线下边
+                y = YB
+                if(y2==y1):
+                    x=x1
+                else:
+                    x = (int)(x1 + (x2 - x1) * (YB - y1) / (y2 - y1))
+            elif (TOP & code != 0):     #点在线上边
+                y = YT
+                if(y2==y1):
+                    x=x1
+                else:
+                    x = (int)(x1 + (x2 - x1) * (YT - y1) / (y2 - y1))
+            if(code==code1):
+                x1=x
+                y1=y
+                code1=encode(x,y,XL,XR,YB,YT)
+            else:
+                x2=x
+                y2=y
+                code2=encode(x,y,XL,XR,YB,YT)
+
+        if(flag==1):
+            pass
+        else:
+            if(x1 > x2):
+                temp = x2
+                x2 = x1
+                x1 = temp
+                temp = y2
+                y2 = y1
+                y1 = temp
+
+            #DDALine(image, x1, y1, x2, y2, False)
+            p_list=[]
+            p_list.append([x1,y1])
+            p_list.append([x2,y2])
+            line=draw_line(p_list,'DDA')
+            result+=line
+    return result

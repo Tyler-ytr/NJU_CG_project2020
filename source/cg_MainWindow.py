@@ -50,6 +50,7 @@ class MainWindow(QMainWindow):
         self.list_widget.currentTextChanged.disconnect(self.canvas_widget.selection_changed)
         self.list_widget.clear()
         self.list_widget.currentTextChanged.connect(self.canvas_widget.selection_changed)
+
         self.scene = QGraphicsScene(self)
         self.scene.setSceneRect(1, 1, 601, 601) #挪一个像素,不然会有边框线
 
@@ -230,7 +231,9 @@ class MainWindow(QMainWindow):
     def fill_draw_action(self):
         self.canvas_widget.start_fill_polygon()
         self.statusBar().showMessage('多边形填充')
-
+    def polygon_clip_draw_action(self):
+        self.canvas_widget.start_cut_polygon()
+        self.statusBar().showMessage('多边形裁剪')
     def tool_init(self):
         # line相关,使用的https://www.walletfox.com/course/customqtoolbutton.php做的可选算法button
         self.line_action_1 = QAction("DDA line")
@@ -344,7 +347,13 @@ class MainWindow(QMainWindow):
         self.fill_action.triggered.connect(self.fill_draw_action)
         self.fill_tool_bar=QToolBar(self)
         self.fill_tool_bar.addAction(self.fill_action)
+        #多边形裁剪相关:
+        self.polygon_clip_action=QAction("Polygon Clip")
+        self.polygon_clip_action.setIcon(QIcon("./icon/cut_polygon.png"))
 
+        self.polygon_clip_action.triggered.connect(self.polygon_clip_draw_action)
+        self.polygon_clip_tool_bar=QToolBar(self)
+        self.polygon_clip_tool_bar.addAction(self.polygon_clip_action)
 
         #     #布局
         tools_layout = QGridLayout()
@@ -359,6 +368,7 @@ class MainWindow(QMainWindow):
         tools_layout.addWidget(self.clip_tool_bar, 0, 7)
         tools_layout.addWidget(self.cursor_tool_bar, 0, 8)
         tools_layout.addWidget(self.fill_tool_bar,0,9)
+        tools_layout.addWidget(self.polygon_clip_tool_bar, 0, 10)
         # 加入tool_window
         tools_widget = QWidget(self.Tool_window)
         tools_widget.setLayout(tools_layout)
