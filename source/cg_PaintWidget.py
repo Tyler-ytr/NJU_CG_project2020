@@ -13,7 +13,7 @@ from PyQt5.QtWidgets import (
     QWidget,
     QStyleOptionGraphicsItem
 )
-from PyQt5.QtGui import QPainter, QMouseEvent, QColor, QPen
+from PyQt5.QtGui import QPainter, QMouseEvent, QColor, QPen,QBitmap,QCursor
 from PyQt5.QtCore import QRectF
 from PyQt5.QtCore import *
 import numpy as np
@@ -113,6 +113,7 @@ class MyCanvas(QGraphicsView):
 
     def start_draw_translate(self):
         self.finish_draw(1)
+        self.setCursor(Qt.SizeAllCursor)
         self.status = 'translate'
 
         self.temp_id = self.selected_id
@@ -121,11 +122,11 @@ class MyCanvas(QGraphicsView):
     def start_draw_rotate(self):
         self.finish_draw(1)
         self.status = 'rotate'
-
         self.temp_id = self.selected_id
 
     def start_draw_scale(self):
         self.finish_draw(1)
+        self.setCursor(Qt.SizeFDiagCursor)
         self.status = 'scale'
 
         self.temp_id = self.selected_id
@@ -157,6 +158,26 @@ class MyCanvas(QGraphicsView):
         self.status='polygon_cut'
         self.temp_id = self.selected_id
         self.finish_draw()
+    def start_x_mirror_draw(self):
+        self.finish_draw(1)
+        self.status='x_mirror'
+        if self.selected_id!='':
+            self.temp_id=self.selected_id
+            self.temp_item=self.item_dict[self.temp_id]
+            self.centerx, self.centery = self.getcenterpoint(self.temp_item)
+            self.temp_item.x_mirror(self.centery)
+
+            self.finish_draw()
+    def start_y_mirror_draw(self):
+        self.finish_draw(1)
+        self.status='y_mirror'
+        if self.selected_id!='':
+            self.temp_id=self.selected_id
+            self.temp_item=self.item_dict[self.temp_id]
+            self.centerx, self.centery = self.getcenterpoint(self.temp_item)
+            self.temp_item.y_mirror(self.centerx)
+
+            self.finish_draw()
 
 
 
@@ -167,13 +188,19 @@ class MyCanvas(QGraphicsView):
             if self.temp_item!=None:
                 self.item_dict[self.temp_id] = self.temp_item
                 self.list_widget.addItem(self.temp_id)
-        if self.status == 'translate' or self.status == 'rotate' or self.status == 'scale' or self.status=='clip' or self.status=='cursor'or a==1 or self.status=='fill'or self.status=='polygon_cut':
+        if self.status == 'translate' or self.status == 'rotate' or self.status == 'scale' or self.status=='clip' or self.status=='cursor'or a==1 or self.status=='fill'or self.status=='polygon_cut' or self.status=='x_mirror'or self.status=='y_mirror':
             self.temp_id = self.selected_id
         else:
             self.temp_id = self.main_window.get_id()
         self.temp_item = None
         self.updateScene([self.sceneRect()])
         self.rotateangle = 0
+        if self.status=='translate' or self.status=='scale':
+            pass
+        else:
+            self.setCursor(Qt.ArrowCursor)
+        if a==1:
+            self.setCursor(Qt.ArrowCursor)
 
     def clear_selection(self):
         if self.selected_id != '':
@@ -362,6 +389,7 @@ class MyCanvas(QGraphicsView):
 
 
 
+
         self.updateScene([self.sceneRect()])
         super().mousePressEvent(event)
 
@@ -431,6 +459,7 @@ class MyCanvas(QGraphicsView):
             self.drawtemp_item.p_list[0]=[xmin,ymin]
             self.drawtemp_item.p_list[1]=[xmax,ymax]
             self.updateScene([self.sceneRect()])
+
 
 
         super().mouseMoveEvent(event)
@@ -606,6 +635,19 @@ class MyItem(QGraphicsItem):
             length=len(self.p_list)
             self.p_list[length-2]=[xmin,ymin]
             self.p_list[length-1]=[xmax,ymax]
+    def x_mirror(self,centery):
+        temp_list=alg.x_mirror(self.p_list,centery)
+        self.p_list = temp_list
+        if self.if_polygon_fill==True:
+            temp_list= alg.x_mirror(self.filled_list,centery)
+            self.filled_list=temp_list
+    def y_mirror(self,centerx):
+        temp_list=alg.y_mirror(self.p_list,centerx)
+        self.p_list = temp_list
+        if self.if_polygon_fill==True:
+            temp_list= alg.y_mirror(self.filled_list,centerx)
+            self.filled_list=temp_list
+
 
 
 

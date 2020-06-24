@@ -873,3 +873,26 @@ def draw_polygon_cut(polygon,XL,XR,YB,YT):
             line=draw_line(p_list,'DDA')
             result+=line
     return result
+def x_mirror(p_list,centery):
+
+    #对称轴:
+    ymid=centery
+    #a-x=x-b
+    #ynew-ymid=ymid-y
+    #ynew=2ymid-y
+    #
+    result=[]
+    for x,y in p_list:
+        #tempy=y
+        tempy=2*ymid-y
+        tempx=x
+        result.append([tempx,tempy])
+    return result
+def y_mirror(p_list,centerx):
+    xmid=centerx
+    result=[]
+    for x,y in p_list:
+        tempy=y
+        tempx=2*xmid-x
+        result.append([tempx,tempy])
+    return result

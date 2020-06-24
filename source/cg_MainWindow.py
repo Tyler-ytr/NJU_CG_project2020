@@ -33,6 +33,73 @@ from PyQt5.QtCore import *
 from PIL import Image
 import numpy as np
 
+css = """
+     QMainWindow{
+                    Background:qlineargradient(x1: 0.5, y1: 0.5, x2: 3, y2: 3,
+                                stop: 0 #F0FFFF, stop: 1 #000080);
+                }
+
+
+
+
+QMenuBar::item {
+    padding: 1px 4px;
+    background: #F0FFFF;
+    border-radius: 4px;
+}
+QDockWidget::title {
+    text-align: left; /* align the text to the left */
+    background:  #F0FFFF;
+    padding-left: 5px;
+}
+
+
+                """
+css1 = """
+     QMainWindow{
+                    Background:qlineargradient(x1: 0.5, y1: 0.5, x2: 3, y2: 3,
+                                stop: 0 #F0FFFF, stop: 1 #000080);
+                }
+
+
+
+
+QMenuBar::item {
+    padding: 1px 4px;
+    background: #F0FFFF;
+    border-radius: 4px;
+}
+QDockWidget::title {
+    text-align: left; /* align the text to the left */
+    background:  #F0FFFF;
+    padding-left: 5px;
+}
+
+
+                """
+css2 = """
+     QMainWindow{
+                    Background:qlineargradient(x1: 0.5, y1: 0.5, x2: 3, y2: 3,
+                                stop: 0 #FFDEAD, stop: 1 #FFF8DC);
+                }
+
+
+
+
+QMenuBar::item {
+    padding: 1px 4px;
+    background: #FDF5E6;
+    border-radius: 4px;
+}
+QDockWidget::title {
+    text-align: left; /* align the text to the left */
+    background: #FDF5E6;
+    padding-left: 5px;
+}
+
+
+
+                """
 
 class CusToolButton(QToolButton):
     def __init__(self, parent=None):
@@ -73,11 +140,15 @@ class MainWindow(QMainWindow):
         pixmap = QPixmap()
         pixmap = self.canvas_widget.grab(self.canvas_widget.sceneRect().toRect())
         pixmap.save(filename)
-
+    def theme1_action(self):
+        self.setStyleSheet(css1)
+    def theme2_action(self):
+        self.setStyleSheet(css2)
     def Menu_init(self):
         menubar = self.menuBar()
         # 菜单栏
         mfile = menubar.addMenu("文件")
+        themefile=menubar.addMenu("主题")
         # 重置
         reset_canvas_act = QAction(QIcon("./icon/file.png"), "重置画布", self)
 
@@ -86,10 +157,17 @@ class MainWindow(QMainWindow):
         # 保存
         save_canvas_act = QAction(QIcon("./icon/save.png"), "保存画布", self)
         save_canvas_act.triggered.connect(self.save_canvas_action)
-
+        #默认主题:
+        theme1_act=QAction("Blue theme",self)
+        theme1_act.triggered.connect(self.theme1_action)
+        theme2_act=QAction("Coffee theme",self)
+        theme2_act.triggered.connect(self.theme2_action)
         # 将action添加到file上面
         mfile.addAction(reset_canvas_act)
         mfile.addAction(save_canvas_act)
+        #将action添加到theme上面
+        themefile.addAction(theme1_act)
+        themefile.addAction(theme2_act)
         # 工具栏
         toolbar = QToolBar()
         toolbar.setMovable(False)
@@ -213,6 +291,7 @@ class MainWindow(QMainWindow):
         self.statusBar().showMessage('旋转图元')
 
     def scale_draw_action(self):
+
         self.canvas_widget.start_draw_scale()
         self.statusBar().showMessage('缩放图元')
 
@@ -234,6 +313,12 @@ class MainWindow(QMainWindow):
     def polygon_clip_draw_action(self):
         self.canvas_widget.start_cut_polygon()
         self.statusBar().showMessage('多边形裁剪')
+    def x_mirror_draw_action(self):
+        self.canvas_widget.start_x_mirror_draw()
+        self.statusBar().showMessage('水平方向镜像')
+    def y_mirror_draw_action(self):
+        self.canvas_widget.start_y_mirror_draw()
+        self.statusBar().showMessage('竖直方向镜像')
     def tool_init(self):
         # line相关,使用的https://www.walletfox.com/course/customqtoolbutton.php做的可选算法button
         self.line_action_1 = QAction("DDA line")
@@ -355,6 +440,21 @@ class MainWindow(QMainWindow):
         self.polygon_clip_tool_bar=QToolBar(self)
         self.polygon_clip_tool_bar.addAction(self.polygon_clip_action)
 
+        #x轴镜像相关:
+        self.x_mirror_action=QAction("X Axis Mirror")
+        self.x_mirror_action.setIcon(QIcon("./icon/flip_horizontal.png"))
+
+        self.x_mirror_action.triggered.connect(self.x_mirror_draw_action)
+        self.x_mirror_tool_bar=QToolBar(self)
+        self.x_mirror_tool_bar.addAction(self.x_mirror_action)
+        #y轴镜像相关:
+        self.y_mirror_action=QAction("Y Axis Mirror")
+        self.y_mirror_action.setIcon(QIcon("./icon/flip_vertical.png"))
+
+        self.y_mirror_action.triggered.connect(self.y_mirror_draw_action)
+        self.y_mirror_tool_bar=QToolBar(self)
+        self.y_mirror_tool_bar.addAction(self.y_mirror_action)
+
         #     #布局
         tools_layout = QGridLayout()
         tools_layout.setAlignment(Qt.AlignLeft)
@@ -369,6 +469,8 @@ class MainWindow(QMainWindow):
         tools_layout.addWidget(self.cursor_tool_bar, 0, 8)
         tools_layout.addWidget(self.fill_tool_bar,0,9)
         tools_layout.addWidget(self.polygon_clip_tool_bar, 0, 10)
+        tools_layout.addWidget(self.x_mirror_tool_bar, 0, 11)
+        tools_layout.addWidget(self.y_mirror_tool_bar, 0, 12)
         # 加入tool_window
         tools_widget = QWidget(self.Tool_window)
         tools_widget.setLayout(tools_layout)
@@ -394,6 +496,7 @@ class MainWindow(QMainWindow):
         QMainWindow.setWindowIcon(self, QIcon("./picture/icon.png"))
         QMainWindow.setWindowTitle(self, "图片编辑器 by Larry")
 
+
         # self.setWindowTitle('CG Demo')
 
         # 界面大小位置
@@ -408,6 +511,7 @@ class MainWindow(QMainWindow):
         self.Image_window.setFeatures(QDockWidget.DockWidgetMovable | QDockWidget.DockWidgetFloatable)
         self.Image_window.setAllowedAreas(Qt.LeftDockWidgetArea | Qt.RightDockWidgetArea)
         self.Image_window.setMinimumSize(620, 620) #大一点点 不然会有边框线
+
 
         self.List_window = QDockWidget("图元列表")
         self.List_window.setFeatures(QDockWidget.DockWidgetMovable)
@@ -438,6 +542,8 @@ class MainWindow(QMainWindow):
 
         self.layout_init()
         self.tool_init()
+
+        self.setStyleSheet(css)
 
         # self.hbox_layout = QHBoxLayout()
         # self.hbox_layout.addWidget(self.canvas_widget)
