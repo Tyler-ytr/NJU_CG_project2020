@@ -475,7 +475,7 @@ class MainWindow(QMainWindow):
         tools_widget = QWidget(self.Tool_window)
         tools_widget.setLayout(tools_layout)
         self.Tool_window.setWidget(tools_widget)
-
+        self.Tool_window.setFeatures(QDockWidget.DockWidgetMovable|QDockWidget.DockWidgetFloatable)
     #
     #
     #     #按钮组 通过按钮组的值连接槽函数确定状态
