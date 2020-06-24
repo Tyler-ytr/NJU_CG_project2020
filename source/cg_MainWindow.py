@@ -494,7 +494,7 @@ class MainWindow(QMainWindow):
         ## 主窗口布局
         # 图片与标题
         QMainWindow.setWindowIcon(self, QIcon("./picture/icon.png"))
-        QMainWindow.setWindowTitle(self, "图片编辑器 by Larry")
+        QMainWindow.setWindowTitle(self, "Image Editor By ytr")
 
 
         # self.setWindowTitle('CG Demo')
