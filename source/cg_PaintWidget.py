@@ -178,13 +178,40 @@ class MyCanvas(QGraphicsView):
             self.temp_item.y_mirror(self.centerx)
 
             self.finish_draw()
+    def start_copy_draw(self,item_id):
+        self.finish_draw(1)
+        self.status='copy'
+        self.temp_item=None
+        if self.selected_id!='':
+            self.temp_id=self.selected_id
+            self.temp_item=self.item_dict[self.temp_id]
+            self.centerx,self.centery=self.getcenterpoint(self.temp_item)
+            self.temp_id=item_id
+            cur_item = MyItem(self.temp_item.pen_width, self.temp_item.pen_color, self.temp_id,
+                              self.temp_item.item_type, self.temp_item.p_list, self.temp_item.algorithm)
+            cur_item.if_polygon_fill=self.temp_item.if_polygon_fill
+            cur_item.filled_list=self.temp_item.filled_list
+            cur_item.fill_color=self.temp_item.fill_color
+            cur_item.fillpen.setColor(cur_item.fill_color)
+
+            self.temp_item=cur_item
+            self.scene().addItem(self.temp_item)
+            self.finish_draw()
+    def start_delete_draw(self):
+        self.finish_draw(1)
+        self.status='delete'
+        if self.selected_id != '':
+            self.temp_id=self.selected_id
+            self.temp_item=self.item_dict[self.temp_id]
+            self.scene().removeItem(self.temp_item)
+
 
 
 
 
     def finish_draw(self,a=0):
 
-        if self.status=='line' or self.status=='ellipse' or self.status=='polygon' or self.status=='curve':
+        if self.status=='line' or self.status=='ellipse' or self.status=='polygon' or self.status=='curve' or self.status=='copy':
             if self.temp_item!=None:
                 self.item_dict[self.temp_id] = self.temp_item
                 self.list_widget.addItem(self.temp_id)
@@ -382,11 +409,6 @@ class MyCanvas(QGraphicsView):
                 self.drawtemp_item=MyItem(1, Qt.green,-1, "Rect", [[x, y], [x, y]],
                                         self.temp_algorithm)
                 self.scene().addItem(self.drawtemp_item)
-
-
-
-
-
 
 
 

@@ -157,6 +157,7 @@ class MainWindow(QMainWindow):
         # 保存
         save_canvas_act = QAction(QIcon("./icon/save.png"), "保存画布", self)
         save_canvas_act.triggered.connect(self.save_canvas_action)
+
         #默认主题:
         theme1_act=QAction("Blue theme",self)
         theme1_act.triggered.connect(self.theme1_action)
@@ -319,6 +320,12 @@ class MainWindow(QMainWindow):
     def y_mirror_draw_action(self):
         self.canvas_widget.start_y_mirror_draw()
         self.statusBar().showMessage('竖直方向镜像')
+    def copy_draw_action(self):
+        self.canvas_widget.start_copy_draw(self.get_id())
+        self.statusBar().showMessage('复制粘贴')
+    def delete_draw_action(self):
+        self.canvas_widget.start_delete_draw()
+        self.statusBar().showMessage('删除图元')
     def tool_init(self):
         # line相关,使用的https://www.walletfox.com/course/customqtoolbutton.php做的可选算法button
         self.line_action_1 = QAction("DDA line")
@@ -454,6 +461,20 @@ class MainWindow(QMainWindow):
         self.y_mirror_action.triggered.connect(self.y_mirror_draw_action)
         self.y_mirror_tool_bar=QToolBar(self)
         self.y_mirror_tool_bar.addAction(self.y_mirror_action)
+        #复制粘贴相关:
+        self.copy_action=QAction("Copy paste")
+        self.copy_action.setIcon(QIcon("./icon/copy.png"))
+
+        self.copy_action.triggered.connect(self.copy_draw_action)
+        self.copy_tool_bar=QToolBar(self)
+        self.copy_tool_bar.addAction(self.copy_action)
+        #删除图元相关:
+        self.delete_action=QAction("Delete")
+        self.delete_action.setIcon(QIcon("./icon/trash.png"))
+
+        self.delete_action.triggered.connect(self.delete_draw_action)
+        self.delete_tool_bar=QToolBar(self)
+        self.delete_tool_bar.addAction(self.delete_action)
 
         #     #布局
         tools_layout = QGridLayout()
@@ -471,6 +492,8 @@ class MainWindow(QMainWindow):
         tools_layout.addWidget(self.polygon_clip_tool_bar, 0, 10)
         tools_layout.addWidget(self.x_mirror_tool_bar, 0, 11)
         tools_layout.addWidget(self.y_mirror_tool_bar, 0, 12)
+        tools_layout.addWidget(self.copy_tool_bar, 0, 13)
+        tools_layout.addWidget(self.delete_tool_bar, 0, 14)
         # 加入tool_window
         tools_widget = QWidget(self.Tool_window)
         tools_widget.setLayout(tools_layout)
