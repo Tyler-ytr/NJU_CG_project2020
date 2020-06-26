@@ -1,6 +1,0 @@
-resetCanvas 600 500
-setColor 0 255 0
-drawEllipse ellipse1 0 100 50 60
-drawEllipse ellipse2 100 0 200 300
-saveCanvas 1
-

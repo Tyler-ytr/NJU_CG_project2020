@@ -1,9 +1,0 @@
-resetCanvas 600 500
-setColor 0 255 0
-drawPolygon p2 0 10 20 50 50 90 100 150 150 110 DDA
-drawCurve p3 0 10 20 50 50 90 100 150 150 110 B-spline
-drawCurve p4 0 10 20 50 50 90 100 150 150 110 Bezier
-translate p3 100 100
-rotate p4 0 0 20
-saveCanvas 1
-
