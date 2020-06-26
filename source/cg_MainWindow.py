@@ -120,6 +120,8 @@ class MainWindow(QMainWindow):
 
         self.scene = QGraphicsScene(self)
         self.scene.setSceneRect(1, 1, 601, 601) #挪一个像素,不然会有边框线
+        self.item_cnt=0
+        self.statusBar().showMessage('重置画布')
 
         self.canvas_widget.setScene(self.scene)
         #self.canvas_widget = MyCanvas(self.scene, self.Image_window)
@@ -241,7 +243,7 @@ class MainWindow(QMainWindow):
 
     def line_action(self, algorithm):
         self.canvas_widget.start_draw_line(algorithm, self.get_id())
-        self.statusBar().showMessage(algorithm + '算法绘制线段')
+        self.statusBar().showMessage(algorithm + '算法绘制线段:左键点击绘制,松开结束')
         self.list_widget.clearSelection()
         self.canvas_widget.clear_selection()
 
@@ -253,7 +255,7 @@ class MainWindow(QMainWindow):
 
     def polygon_action(self, algorithm):
         self.canvas_widget.start_draw_polygon(algorithm, self.get_id())
-        self.statusBar().showMessage(algorithm + '算法绘制多边形')
+        self.statusBar().showMessage(algorithm + '算法绘制多边形:左键点击设置控制点,右键或者切换其他工具栏图标结束')
         self.list_widget.clearSelection()
         self.canvas_widget.clear_selection()
 
@@ -265,13 +267,13 @@ class MainWindow(QMainWindow):
 
     def ellipse_draw_action(self):
         self.canvas_widget.start_draw_ellipse(self.get_id())
-        self.statusBar().showMessage('中心圆算法绘制椭圆')
+        self.statusBar().showMessage('中心圆算法绘制椭圆:左键点击设置控制点1,拖动松开后设置控制点2,完成绘制')
         self.list_widget.clearSelection()
         self.canvas_widget.clear_selection()
 
     def curve_draw_action(self, algorithm):
         self.canvas_widget.start_draw_curve(algorithm, self.get_id())
-        self.statusBar().showMessage(algorithm + '算法绘制曲线')
+        self.statusBar().showMessage(algorithm + '算法绘制曲线:左键点击设置控制点,右键或者点击其他工具栏图标结束绘制')
         self.list_widget.clearSelection()
         self.canvas_widget.clear_selection()
 
@@ -283,22 +285,22 @@ class MainWindow(QMainWindow):
 
     def translate_draw_action(self):
         self.canvas_widget.start_draw_translate()
-        self.statusBar().showMessage('平移图元')
+        self.statusBar().showMessage('平移图元:选择图元之后任意拖动,松开结束')
         # self.list_widget.clearSelection()
         # self.canvas_widget.clear_selection()
 
     def rotate_draw_action(self):
         self.canvas_widget.start_draw_rotate()
-        self.statusBar().showMessage('旋转图元')
+        self.statusBar().showMessage('旋转图元:选择图元之后任意旋转,松开结束')
 
     def scale_draw_action(self):
 
         self.canvas_widget.start_draw_scale()
-        self.statusBar().showMessage('缩放图元')
+        self.statusBar().showMessage('缩放图元:选择图元之后任意移动,松开结束')
 
     def clip_draw_action(self, algorithm):
         self.canvas_widget.start_draw_clip(algorithm)
-        self.statusBar().showMessage(algorithm + '裁剪线段')
+        self.statusBar().showMessage(algorithm + '裁剪线段:选择线段图元之后,左键点击拖动得到红色的裁剪框,松开结束')
 
     def Cohen_Sutherland_clip_draw_action(self):
         self.clip_draw_action("Cohen-Sutherland")
@@ -307,25 +309,25 @@ class MainWindow(QMainWindow):
         self.clip_draw_action("Liang-Barsky")
     def cursor_draw_action(self):
         self.canvas_widget.start_cursor_selection()
-        self.statusBar().showMessage('鼠标选择')
+        self.statusBar().showMessage('鼠标选择:左键点击任意图元进行选择')
     def fill_draw_action(self):
         self.canvas_widget.start_fill_polygon()
-        self.statusBar().showMessage('多边形填充')
+        self.statusBar().showMessage('多边形填充:选择多边形图元之后根据颜色框颜色填充')
     def polygon_clip_draw_action(self):
         self.canvas_widget.start_cut_polygon()
-        self.statusBar().showMessage('多边形裁剪')
+        self.statusBar().showMessage('多边形裁剪:选择多边形图元之后左键点击拖动得到绿色裁剪框进行裁剪')
     def x_mirror_draw_action(self):
         self.canvas_widget.start_x_mirror_draw()
-        self.statusBar().showMessage('水平方向镜像')
+        self.statusBar().showMessage('水平方向镜像:选择图元之后点击按钮')
     def y_mirror_draw_action(self):
         self.canvas_widget.start_y_mirror_draw()
-        self.statusBar().showMessage('竖直方向镜像')
+        self.statusBar().showMessage('竖直方向镜像:选择图元之后点击按钮')
     def copy_draw_action(self):
         self.canvas_widget.start_copy_draw(self.get_id())
-        self.statusBar().showMessage('复制粘贴')
+        self.statusBar().showMessage('复制粘贴:选择图元之后点击按钮,在原位置复制')
     def delete_draw_action(self):
         self.canvas_widget.start_delete_draw()
-        self.statusBar().showMessage('删除图元')
+        self.statusBar().showMessage('删除图元:选择图元之后点击按钮删除')
     def tool_init(self):
         # line相关,使用的https://www.walletfox.com/course/customqtoolbutton.php做的可选算法button
         self.line_action_1 = QAction("DDA line")

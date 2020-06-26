@@ -34,24 +34,28 @@ if __name__ == '__main__':
                         pixels = alg.draw_line(p_list, algorithm)
                         for x, y in pixels:
                             #canvas[y, x] = color
-                            canvas[height - 1 - y, x] = color
+                            if height - 1 - y < height and x < width:
+                                canvas[height - 1 - y, x] = color
                     elif item_type == 'polygon':
                         pixels = alg.draw_polygon(p_list, algorithm)
                         for x, y in pixels:
                             #canvas[y, x] = color
-                            canvas[height - 1 - y, x] = color
+                            if height-1-y<height and x <width:
+                                canvas[height - 1 - y, x] = color
 
                     elif item_type == 'ellipse':
                         pixels = alg.draw_ellipse(p_list)
                         for x, y in pixels:
                             #canvas[y, x] = color
-                            canvas[height - 1 - y, x] = color
+                            if height - 1 - y < height and x < width:
+                                canvas[height - 1 - y, x] = color
 
                     elif item_type == 'curve':
                         pixels = alg.draw_curve(p_list, algorithm)
                         for x, y in pixels:
                             #canvas[y, x] = color
-                            canvas[height - 1 - y, x] = color
+                            if height - 1 - y < height and x < width:
+                                canvas[height - 1 - y, x] = color
 
                 Image.fromarray(canvas).save(os.path.join(output_dir, save_name + '.bmp'), 'bmp')
             elif line[0] == 'setColor':
@@ -123,7 +127,7 @@ if __name__ == '__main__':
                 item_type, p_list, algorithm, color = item_dict[item_id]
                 x = int(line[2])
                 y = int(line[3])
-                s = int(line[4])
+                s = int(float(line[4]))
                 newp_list = alg.scale(p_list, x, y, s)
                 item_dict[item_id] = [item_type, newp_list, algorithm, color]
             elif line[0]=='clip':

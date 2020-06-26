@@ -50,6 +50,9 @@ class MyCanvas(QGraphicsView):
 
         self.rotateangle = 0
     def reset_canvas(self):
+        self.status = ''
+        self.temp_algorithm = ''
+        self.temp_id = ''
         pass
         #self.clear_selection()
         #print("herer")
