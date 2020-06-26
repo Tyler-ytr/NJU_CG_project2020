@@ -1,3 +1,7 @@
+# README
+
+具体算法以及实现见[报告]([https://github.com/Tyler-ytr/NJU_CV_project2020/blob/master/final_version/171240565_%E6%8A%A5%E5%91%8A.md](https://github.com/Tyler-ytr/NJU_CV_project2020/blob/master/final_version/171240565_报告.md))
+
 ## 系统使用说明书
 
 [TOC]
@@ -25,11 +29,11 @@
 
 这里有一个feature:被删除的图元在图元列表点击之后复制可以在原来的位置上出现一个新的图元,还是原来的样子;
 
-![img](picture/function_total.png)
+![img](final_version/picture/function_total.png)
 
 我的图像编辑框是固定的大小,可以移动,浮动;工具栏也可以移动和浮动;
 
-![img](picture/float_function.png)
+![img](final_version/picture/float_function.png)
 
 #### 设置画笔
 
@@ -37,7 +41,7 @@
 
 点击画笔颜色就会弹出颜色对话框,从而可以进行颜色的选择;
 
-![image-20200625224832270](picture/image-20200625224832270.png)
+![image-20200625224832270](final_version/picture/image-20200625224832270.png)
 
 #### 绘制直线
 
@@ -45,7 +49,7 @@
 
 点击按钮旁边的下标键就可以选择其他算法了;
 
-![image-20200625224729925](picture/image-20200625224729925.png)
+![image-20200625224729925](final_version/picture/image-20200625224729925.png)
 
 #### 绘制多边形
 
@@ -53,15 +57,15 @@
 
 同样多边形有两种算法,点击按钮旁边的下标就可以选择了;
 
-![img](picture/polygon.png)
+![img](final_version/picture/polygon.png)
 
-![image-20200625230815158](picture/image-20200625230815158.png)
+![image-20200625230815158](final_version/picture/image-20200625230815158.png)
 
 #### 绘制椭圆
 
 点击椭圆按钮,左键在图像编辑框任意一点点击获得第一个控制点,然后按住拖动,根据当前鼠标位置作为第二个控制点,实时绘制椭圆,松开鼠标设置第二个控制点完成绘制;
 
-![image-20200625231837487](picture/image-20200625231837487.png)
+![image-20200625231837487](final_version/picture/image-20200625231837487.png)
 
 #### 绘制曲线
 
@@ -69,15 +73,15 @@
 
 点击按钮旁边地下标可以切换算法,注意B-Spline得第三个控制点开始会出现绘制的曲线;
 
-![image-20200625234327537](picture/image-20200625234327537.png)
+![image-20200625234327537](final_version/picture/image-20200625234327537.png)
 
-![image-20200625234347329](picture/image-20200625234347329.png)
+![image-20200625234347329](final_version/picture/image-20200625234347329.png)
 
 #### 平移图元
 
 使用鼠标点选或者图元列表选择选中图元后,点击平移的按钮,鼠标发生变化;此时再次点击图像编辑框中的任意一点然后拖动就可以平移,松开即停止;如果还想移动,继续点击任意一点拖动即可;
 
-![image-20200625234755055](picture/image-20200625234755055.png)
+![image-20200625234755055](final_version/picture/image-20200625234755055.png)
 
 #### 旋转图元
 
@@ -85,27 +89,27 @@
 
 按过旋转按钮之后,选择图元,在图像编辑框任意一点按住然后旋转就可以实时的旋转,松开鼠标结束;如果还想再次旋转可以继续按住一点然后旋转;
 
-![img](picture/QPI_JP1W67CG}NU8QB2X}GJ.png)
+![img](final_version/picture/QPI_JP1W67CG}NU8QB2X}GJ.png)
 
 #### 缩放图元
 
 按过缩放按钮之后,选择图元,然后再图像编辑框任意一点按住之后移动就可以实时的缩放,松开即完成;如果还想继续缩放可以按住一点然后继续缩放;
 
-![image-20200626002201731](picture/image-20200626002201731.png)
+![image-20200626002201731](final_version/picture/image-20200626002201731.png)
 
 #### 线段裁剪
 
 选中线段类型的图元之后,点击裁剪按钮,选择裁剪算法,然后在任意一点按住然后拖动就会出现蓝色的裁剪框,松开之后完成裁剪;
 
-![image-20200626003235287](picture/image-20200626003235287.png)
+![image-20200626003235287](final_version/picture/image-20200626003235287.png)
 
-![image-20200626003249200](picture/image-20200626003249200.png)
+![image-20200626003249200](final_version/picture/image-20200626003249200.png)
 
 #### 鼠标点选
 
 点击光标按钮,然后任意点选即可;
 
-![image-20200626003510312](picture/image-20200626003510312.png)
+![image-20200626003510312](final_version/picture/image-20200626003510312.png)
 
 #### 多边形填充
 
@@ -113,7 +117,7 @@
 
 注意:裁剪之后的多边形无法被填充;
 
-![image-20200626003812804](picture/image-20200626003812804.png)
+![image-20200626003812804](final_version/picture/image-20200626003812804.png)
 
 #### 多边形裁剪
 
@@ -121,21 +125,21 @@
 
 注意:多边形可以多次裁剪,但是每一次都相当于对原来的多边形进行裁剪;经过裁剪之后的多边形无法被填充,不管是否完整;
 
-![image-20200626003943979](picture/image-20200626003943979.png)
+![image-20200626003943979](final_version/picture/image-20200626003943979.png)
 
-![image-20200626004527621](picture/image-20200626004527621.png)
+![image-20200626004527621](final_version/picture/image-20200626004527621.png)
 
 #### 镜像操作
 
 有水平镜像和垂直镜像两种,选中图元然后点击即可;
 
-![image-20200626004645990](picture/image-20200626004645990.png)
+![image-20200626004645990](final_version/picture/image-20200626004645990.png)
 
 #### 复制粘贴操作
 
 选择图元之后点击按钮就会在原来的位置复制一个一模一样的图元,下图为了演示还用了移动操作;
 
-![image-20200626004806040](picture/image-20200626004806040.png)
+![image-20200626004806040](final_version/picture/image-20200626004806040.png)
 
 #### 删除操作
 
@@ -143,10 +147,10 @@
 
 注意:删除之后图元选择列表依然有这个图元标号,此时选中之后点击复制按钮可以在原来的位置再复制一个新的图元;
 
-![image-20200626004837113](picture/image-20200626004837113.png)
+![image-20200626004837113](final_version/picture/image-20200626004837113.png)
 
 #### 更换主题
 
 点击主题就可以更换主题了,目前支持两种主题:Blue theme和Coffee theme
 
-![image-20200626005042732](picture/image-20200626005042732.png)
+![image-20200626005042732](final_version/picture/image-20200626005042732.png)
