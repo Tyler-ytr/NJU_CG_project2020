@@ -1,5 +1,7 @@
 # README
 
+图形编辑器,南京大学图形学的大作业。
+
 具体算法以及实现见[报告]([https://github.com/Tyler-ytr/NJU_CV_project2020/blob/master/final_version/171240565_%E6%8A%A5%E5%91%8A.md](https://github.com/Tyler-ytr/NJU_CV_project2020/blob/master/final_version/171240565_报告.md))
 
 ## 系统使用说明书
